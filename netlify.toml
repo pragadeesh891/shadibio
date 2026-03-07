@@ -1,0 +1,13 @@
+[build]
+  # Set the base directory to the React app folder
+  base = "client"
+  # The command to build the React application
+  command = "npm run build"
+  # The directory containing the built assets
+  publish = "build"
+
+# Needed for React Router to work correctly (prevents 404s on refresh)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
