@@ -1,0 +1,457 @@
+/* Horoscope Match Page Styles */
+
+.horoscope-container {
+    min-height: 100vh;
+    background: radial-gradient(circle at center, #1a0b2e 0%, #0d0617 100%);
+    color: white;
+    font-family: 'Inter', system-ui, sans-serif;
+    padding-bottom: 4rem;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Starry background animation */
+.stars-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: transparent url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSIxIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIwLjMiLz48Y2lyY2xlIGN4PSIyMTAiIGN5PSIxMjAiIHI9IjAuNSIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iMC41Ii8+PGNpcmNsZSBjeD0iMzMwIiBjeT0iMzUwIiByPSIxLjUiIGZpbGw9IiNmZmYiIG9wYWNpdHk9IjAuNCIvPjwvc3ZnPg==') repeat;
+    animation: stars-drift 100s linear infinite;
+    z-index: 0;
+}
+
+@keyframes stars-drift {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: -10000px 5000px;
+    }
+}
+
+.horoscope-content {
+    position: relative;
+    z-index: 10;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Header */
+.hm-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-top: 3rem;
+}
+
+.hm-title {
+    font-size: 3.5rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #ffd700, #ff8c00);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+}
+
+.hm-subtitle {
+    font-size: 1.2rem;
+    color: #a09eb5;
+}
+
+/* Input Card */
+.hm-input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+    .hm-input-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.hm-input-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hm-input-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.boy-card {
+    border-top: 4px solid #4a90e2;
+}
+
+.girl-card {
+    border-top: 4px solid #e91e63;
+}
+
+.hm-card-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.boy-card .hm-card-title {
+    color: #4a90e2;
+}
+
+.girl-card .hm-card-title {
+    color: #e91e63;
+}
+
+.hm-form-group {
+    margin-bottom: 1.5rem;
+}
+
+.hm-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    font-weight: 500;
+}
+
+.hm-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s;
+}
+
+.hm-input:focus {
+    border-color: rgba(255, 215, 0, 0.5);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.1);
+}
+
+.hm-action-wrap {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.hm-btn {
+    background: linear-gradient(135deg, #ff8c00, #ff007f);
+    color: white;
+    border: none;
+    padding: 1.2rem 3rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(255, 140, 0, 0.3);
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.hm-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 40px rgba(255, 140, 0, 0.5);
+}
+
+.hm-btn:disabled {
+    background: #475569;
+    box-shadow: none;
+    transform: none;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Results Section */
+.hm-results {
+    margin-top: 4rem;
+    animation: fade-in-up 0.8s ease backwards;
+}
+
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hm-score-board {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 30px;
+    padding: 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 3rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.hm-flare {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(255, 215, 0, 0.1) 0%, transparent 50%);
+    animation: rotate-flare 20s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes rotate-flare {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.hm-radial-wrap {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    margin: 0 auto 2rem;
+}
+
+/* SVG Radial Progress */
+.hm-radial-svg {
+    transform: rotate(-90deg);
+    width: 100%;
+    height: 100%;
+}
+
+.hm-radial-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 8;
+}
+
+.hm-radial-progress {
+    fill: none;
+    stroke: url(#gradient);
+    stroke-width: 10;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 2s ease-out;
+}
+
+.hm-score-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hm-score-num {
+    font-size: 4.5rem;
+    font-weight: 900;
+    line-height: 1;
+    color: white;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.hm-score-total {
+    font-size: 1.2rem;
+    color: #a09eb5;
+    margin-top: 0.5rem;
+}
+
+.hm-verdict {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.hm-verdict.excellent {
+    color: #4ade80;
+    text-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
+}
+
+.hm-verdict.good {
+    color: #60a5fa;
+    text-shadow: 0 0 20px rgba(96, 165, 250, 0.4);
+}
+
+.hm-verdict.average {
+    color: #fbbf24;
+    text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+}
+
+.hm-verdict.poor {
+    color: #f87171;
+    text-shadow: 0 0 20px rgba(248, 113, 113, 0.4);
+}
+
+.hm-verdict-desc {
+    color: #cbd5e1;
+    font-size: 1.1rem;
+    opacity: 0.8;
+}
+
+/* Kootas Grid */
+.hm-kootas-title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+    color: white;
+}
+
+.hm-kootas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+
+.hm-koota-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    animation: koota-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
+    transition: transform 0.2s;
+}
+
+.hm-koota-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+@keyframes koota-pop {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.hm-koota-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.hm-koota-desc {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-bottom: 1rem;
+    height: 30px;
+}
+
+.hm-koota-score-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0.2rem;
+}
+
+.hm-koota-obtained {
+    font-size: 2rem;
+    font-weight: 900;
+}
+
+.hm-koota-card.high .hm-koota-obtained {
+    color: #4ade80;
+}
+
+.hm-koota-card.med .hm-koota-obtained {
+    color: #fbbf24;
+}
+
+.hm-koota-card.low .hm-koota-obtained {
+    color: #f87171;
+}
+
+.hm-koota-max {
+    font-size: 1rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+/* Loading Overlay */
+.hm-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(13, 6, 23, 0.9);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.hm-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 215, 0, 0.2);
+    border-top-color: #ffd700;
+    border-radius: 50%;
+    animation: spin 1s infinite linear;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.hm-loader-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    background: linear-gradient(90deg, #ffd700, #ff8c00, #ffd700);
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 2s linear infinite;
+}
+
+@keyframes shine {
+    to {
+        background-position: 200% center;
+    }
+}
