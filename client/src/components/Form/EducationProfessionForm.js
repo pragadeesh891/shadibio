@@ -15,19 +15,23 @@ const EducationProfessionForm = ({ formData, updateFormData }) => {
     workLocation: ''
   });
 
-  // Load data once on mount or when id changes (to avoid keystroke jitter)
+  // Load data once when available, but avoid overwriting active typing
   useEffect(() => {
     if (formData && formData.educationDetails) {
-      setLocalData(prev => ({
-        ...prev,
-        ...formData.educationDetails,
-        annualIncome: {
-          amount: formData.educationDetails.annualIncome?.amount || '',
-          currency: formData.educationDetails.annualIncome?.currency || 'INR'
-        }
-      }));
+      // Only auto-fill if the main fields are still empty (initial load)
+      const isInitialLoad = !localData.highestEducation && !localData.occupation;
+      if (isInitialLoad) {
+        setLocalData(prev => ({
+          ...prev,
+          ...formData.educationDetails,
+          annualIncome: {
+            amount: formData.educationDetails.annualIncome?.amount || '',
+            currency: formData.educationDetails.annualIncome?.currency || 'INR'
+          }
+        }));
+      }
     }
-  }, []); // Only on mount to initialize value
+  }, [formData, localData.highestEducation, localData.occupation]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

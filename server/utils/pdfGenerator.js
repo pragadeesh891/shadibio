@@ -512,7 +512,7 @@ const generateModernTemplate = (biodata, customization = {}, isPremium = false) 
                   ${horoscopeDetails.manglik ? `<div class="info-item"><span class="label">🪐 Manglik:</span> <span class="value">${horoscopeDetails.manglik}</span></div>` : ''}
                   ${horoscopeDetails.timeOfBirth ? `<div class="info-item"><span class="label">⏰ Time of Birth:</span> <span class="value">${horoscopeDetails.timeOfBirth}</span></div>` : ''}
                   ${horoscopeDetails.placeOfBirth ? `<div class="info-item"><span class="label">🌍 Place of Birth:</span> <span class="value">${horoscopeDetails.placeOfBirth}</span></div>` : ''}
-                  ${horoscopeDetails.gotra ? `<div class="info-item"><span class="label"> tộc Gotra:</span> <span class="value">${horoscopeDetails.gotra}</span></div>` : ''}
+                  ${horoscopeDetails.gotra ? `<div class="info-item"><span class="label"> Gotra:</span> <span class="value">${horoscopeDetails.gotra}</span></div>` : ''}
                 </div>
               </div>
             ` : ''}
@@ -562,22 +562,30 @@ const generateBiodataPDF = async (biodata, template = 'Traditional', customizati
     // Add password protection
     if (pdfPassword) {
       try {
-        const inStream = new muhammara.PDFRStreamForBuffer(pdfBuffer);
-        const outStream = new muhammara.PDFWStreamForBuffer();
+        // For muhammara, we can use the buffer directly if using PDFWStreamForBuffer
+        // Note: Check if muhammara is actually available
+        if (muhammara) {
+          const inStream = new muhammara.PDFRStreamForBuffer(pdfBuffer);
+          const outStream = new muhammara.PDFWStreamForBuffer();
 
-        muhammara.recrypt(inStream, outStream, {
-          userPassword: pdfPassword,
-          ownerPassword: 'shadi_bio_admin',
-          userPrivileges: {
-            print: 'highQuality',
-            modify: 'none',
-            copy: 'none',
-            annotate: 'none',
-            fillForms: 'none'
+          muhammara.recrypt(inStream, outStream, {
+            userPassword: pdfPassword,
+            ownerPassword: 'shadi_bio_admin',
+            userPrivileges: {
+              print: 'highQuality',
+              modify: 'none',
+              copy: 'none',
+              annotate: 'none',
+              fillForms: 'none'
+            }
+          });
+
+          if (outStream.buffer) {
+            pdfBuffer = outStream.buffer;
+          } else if (typeof outStream.getBuffer === 'function') {
+            pdfBuffer = outStream.getBuffer();
           }
-        });
-
-        pdfBuffer = outStream.buffer;
+        }
       } catch (encryptError) {
         console.error('PDF Encryption error:', encryptError);
       }
