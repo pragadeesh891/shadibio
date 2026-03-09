@@ -15,44 +15,44 @@ const EducationProfessionForm = ({ formData, updateFormData }) => {
     workLocation: ''
   });
 
-  // Load existing data when component mounts
+  // Load data once on mount or when id changes (to avoid keystroke jitter)
   useEffect(() => {
     if (formData && formData.educationDetails) {
-      setLocalData({
-        ...localData,
+      setLocalData(prev => ({
+        ...prev,
         ...formData.educationDetails,
         annualIncome: {
           amount: formData.educationDetails.annualIncome?.amount || '',
           currency: formData.educationDetails.annualIncome?.currency || 'INR'
         }
-      });
+      }));
     }
-  }, [formData]);
+  }, []); // Only on mount to initialize value
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Handle nested fields
     if (name.includes('.')) {
       const parts = name.split('.');
-      
+
       if (parts[0] === 'annualIncome') {
         const field = parts[1];
         const updatedAnnualIncome = { ...localData.annualIncome, [field]: value };
         const updatedData = { ...localData, annualIncome: updatedAnnualIncome };
-        
+
         setLocalData(updatedData);
         updateFormData({ educationDetails: updatedData });
       } else {
         const updatedData = { ...localData, [name]: value };
-        
+
         setLocalData(updatedData);
         updateFormData({ educationDetails: updatedData });
       }
     } else {
       // Handle top-level fields
       const updatedData = { ...localData, [name]: value };
-      
+
       setLocalData(updatedData);
       updateFormData({ educationDetails: updatedData });
     }
@@ -61,7 +61,7 @@ const EducationProfessionForm = ({ formData, updateFormData }) => {
   const handleQualificationsChange = (e) => {
     const qualification = e.target.value;
     const updatedQualifications = [...localData.additionalQualifications];
-    
+
     if (e.target.checked) {
       if (!updatedQualifications.includes(qualification)) {
         updatedQualifications.push(qualification);
@@ -72,7 +72,7 @@ const EducationProfessionForm = ({ formData, updateFormData }) => {
         updatedQualifications.splice(index, 1);
       }
     }
-    
+
     const updatedData = { ...localData, additionalQualifications: updatedQualifications };
     setLocalData(updatedData);
     updateFormData({ educationDetails: updatedData });
@@ -123,7 +123,7 @@ const EducationProfessionForm = ({ formData, updateFormData }) => {
               React.createElement('option', { value: 'Other' }, 'Other')
             )
           ),
-          
+
           // College/University
           React.createElement(
             'div',
@@ -142,7 +142,7 @@ const EducationProfessionForm = ({ formData, updateFormData }) => {
               className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
             })
           ),
-          
+
           // Specialization/Major
           React.createElement(
             'div',
@@ -162,7 +162,7 @@ const EducationProfessionForm = ({ formData, updateFormData }) => {
             })
           )
         ),
-        
+
         // Additional Qualifications
         React.createElement(
           'div',
@@ -280,7 +280,7 @@ const EducationProfessionForm = ({ formData, updateFormData }) => {
           )
         )
       ),
-      
+
       // Profession Information
       React.createElement(
         'div',
@@ -324,7 +324,7 @@ const EducationProfessionForm = ({ formData, updateFormData }) => {
               React.createElement('option', { value: 'Other' }, 'Other')
             )
           ),
-          
+
           // Company Name
           React.createElement(
             'div',
@@ -343,7 +343,7 @@ const EducationProfessionForm = ({ formData, updateFormData }) => {
               className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
             })
           ),
-          
+
           // Annual Income
           React.createElement(
             'div',
@@ -379,7 +379,7 @@ const EducationProfessionForm = ({ formData, updateFormData }) => {
               })
             )
           ),
-          
+
           // Work Location
           React.createElement(
             'div',

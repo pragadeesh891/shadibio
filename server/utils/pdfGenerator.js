@@ -1,5 +1,10 @@
 const pdf = require('html-pdf-node');
-const muhammara = require('muhammara');
+let muhammara;
+try {
+  muhammara = require('muhammara');
+} catch (e) {
+  console.warn('muhammara module not found. PDF password protection will be disabled.');
+}
 
 // Helper: get profile photo from biodata (stored at top-level biodata.profilePhoto)
 const getProfilePhoto = (biodata) => biodata?.profilePhoto || biodata?.personalDetails?.profilePhoto || null;

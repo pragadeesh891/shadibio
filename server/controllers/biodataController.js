@@ -256,17 +256,26 @@ const generatePDF = async (req, res) => {
     }
 
     // Generate PDF (with password protection if available)
-    const pdfBuffer = await generateBiodataPDF(
-      sanitizedBiodata,
-      template,
-      customization,
-      req.user?.isPremium,
-      pdfPassword
-    );
+    let pdfBuffer;
+    try {
+      pdfBuffer = await generateBiodataPDF(
+        sanitizedBiodata,
+        template,
+        customization,
+        req.user?.isPremium,
+        pdfPassword
+      );
+    } catch (pdfError) {
+      console.error('PDF Generation Engine Error:', pdfError);
+      return res.status(500).json({ success: false, message: 'PDF Engine Error' });
+    }
 
     // Set response headers for PDF download
+    const rawName = biodata.personalDetails?.fullName || 'biodata';
+    const safeName = rawName.trim().replace(/\s+/g, '_');
+
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=biodata_${biodata.personalDetails.fullName.replace(/\s+/g, '_')}.pdf`);
+    res.setHeader('Content-Disposition', `attachment; filename=biodata_${safeName}.pdf`);
 
     // Send PDF buffer
     res.send(pdfBuffer);

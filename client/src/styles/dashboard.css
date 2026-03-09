@@ -1383,18 +1383,28 @@
 .dash-root select,
 .dash-root textarea {
     width: 100%;
-    padding: 10px 13px;
-    background: var(--c-bg-input);
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    /* Better contrast */
     border: 1px solid var(--c-border);
     border-radius: var(--r-sm);
-    font-size: 13.5px;
-    /* Base size */
+    font-size: 14px;
     color: var(--c-text-h);
     outline: none;
     transition: all var(--t-base) var(--ease);
     font-family: inherit;
     -webkit-appearance: none;
     appearance: none;
+    cursor: text;
+}
+
+.dash-root select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
 }
 
 @media (max-width: 768px) {
