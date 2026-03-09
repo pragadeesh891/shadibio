@@ -145,7 +145,7 @@ const DashboardPage = () => {
         a.download = `biodata_${biodata?.personalDetails?.fullName?.replace(/\s+/g, '_') || 'download'}.pdf`;
         a.click();
         window.URL.revokeObjectURL(url);
-        setMessage({ type: 'success', text: 'PDF downloaded! 📄' });
+        setMessage({ type: 'success', text: 'PDF Downloaded! 📄 The PDF is password protected. Use your birthdate (DDMMYYYY) to open it.' });
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to download PDF' });

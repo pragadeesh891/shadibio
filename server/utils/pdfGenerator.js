@@ -1,4 +1,5 @@
 const pdf = require('html-pdf-node');
+const muhammara = require('muhammara');
 
 // Helper: get profile photo from biodata (stored at top-level biodata.profilePhoto)
 const getProfilePhoto = (biodata) => biodata?.profilePhoto || biodata?.personalDetails?.profilePhoto || null;
@@ -523,7 +524,7 @@ const generateModernTemplate = (biodata, customization = {}, isPremium = false) 
 };
 
 // Main PDF generation function
-const generateBiodataPDF = async (biodata, template = 'Traditional', customization = {}, isPremium = false) => {
+const generateBiodataPDF = async (biodata, template = 'Traditional', customization = {}, isPremium = false, pdfPassword = null) => {
   try {
     let htmlContent;
 
@@ -551,7 +552,31 @@ const generateBiodataPDF = async (biodata, template = 'Traditional', customizati
     };
 
     const file = { content: htmlContent };
-    const pdfBuffer = await pdf.generatePdf(file, options);
+    let pdfBuffer = await pdf.generatePdf(file, options);
+
+    // Add password protection
+    if (pdfPassword) {
+      try {
+        const inStream = new muhammara.PDFRStreamForBuffer(pdfBuffer);
+        const outStream = new muhammara.PDFWStreamForBuffer();
+
+        muhammara.recrypt(inStream, outStream, {
+          userPassword: pdfPassword,
+          ownerPassword: 'shadi_bio_admin',
+          userPrivileges: {
+            print: 'highQuality',
+            modify: 'none',
+            copy: 'none',
+            annotate: 'none',
+            fillForms: 'none'
+          }
+        });
+
+        pdfBuffer = outStream.buffer;
+      } catch (encryptError) {
+        console.error('PDF Encryption error:', encryptError);
+      }
+    }
 
     return pdfBuffer;
   } catch (error) {

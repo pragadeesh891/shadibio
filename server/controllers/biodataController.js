@@ -245,8 +245,24 @@ const generatePDF = async (req, res) => {
       delete sanitizedBiodata.educationDetails.annualIncome;
     }
 
-    // Generate PDF
-    const pdfBuffer = await generateBiodataPDF(sanitizedBiodata, template, customization, req.user?.isPremium);
+    // Format birthdate as DDMMYYYY for the password
+    let pdfPassword = null;
+    if (biodata.personalDetails?.dateOfBirth) {
+      const dob = new Date(biodata.personalDetails.dateOfBirth);
+      const day = String(dob.getDate()).padStart(2, '0');
+      const month = String(dob.getMonth() + 1).padStart(2, '0');
+      const year = dob.getFullYear();
+      pdfPassword = `${day}${month}${year}`;
+    }
+
+    // Generate PDF (with password protection if available)
+    const pdfBuffer = await generateBiodataPDF(
+      sanitizedBiodata,
+      template,
+      customization,
+      req.user?.isPremium,
+      pdfPassword
+    );
 
     // Set response headers for PDF download
     res.setHeader('Content-Type', 'application/pdf');
