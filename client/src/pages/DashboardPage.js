@@ -128,7 +128,12 @@ const DashboardPage = () => {
   const handleDownloadPDF = async () => {
     if (!biodata) return;
     try {
-      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+      const API_URL = process.env.REACT_APP_API_URL ||
+        (window.location.hostname === 'localhost'
+          ? 'http://localhost:5000/api'
+          : 'https://shadibio.onrender.com/api');
+
+      setSaving(true); // Show loading state
       const response = await fetch(`${API_URL}/biodata/${biodata._id}/pdf`, {
         method: 'POST',
         headers: {
