@@ -51,9 +51,14 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
   }, [localData.dateOfBirth, localData.age, updateFormData]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    let updatedData;
+    let { name, value } = e.target;
 
+    // Numeric numeric for specific fields
+    if (['phone', 'weight', 'age'].includes(name)) {
+      value = value.replace(/[^0-9]/g, '');
+    }
+
+    let updatedData;
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
       updatedData = {
@@ -72,7 +77,9 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
   };
 
   const handleHeightChange = (e) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    value = value.replace(/[^0-9.]/g, ''); // Allow decimal for height
+
     const updatedHeight = { ...localData.height, [name]: value };
     const updatedData = { ...localData, height: updatedHeight };
 
@@ -164,12 +171,14 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
           'Phone Number *'
         ),
         React.createElement('input', {
-          type: 'tel',
+          type: 'text',
           id: 'phone',
           name: 'phone',
           value: localData.phone,
           onChange: handleChange,
           required: true,
+          inputMode: 'numeric',
+          pattern: '[0-9]*',
           placeholder: 'e.g., 9876543210',
           className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
         })
@@ -228,14 +237,12 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
           'Height (Feet)'
         ),
         React.createElement('input', {
-          type: 'number',
+          type: 'text',
           id: 'feet',
           name: 'feet',
           value: localData.height.feet,
           onChange: handleHeightChange,
-          min: '0',
-          max: '8',
-          step: '0.1',
+          inputMode: 'decimal',
           className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
         })
       ),
@@ -250,14 +257,12 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
           'Height (Inches)'
         ),
         React.createElement('input', {
-          type: 'number',
+          type: 'text',
           id: 'inches',
           name: 'inches',
           value: localData.height.inches,
           onChange: handleHeightChange,
-          min: '0',
-          max: '11',
-          step: '0.1',
+          inputMode: 'decimal',
           className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
         })
       ),
@@ -272,13 +277,13 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
           'Weight (kg)'
         ),
         React.createElement('input', {
-          type: 'number',
+          type: 'text',
           id: 'weight',
           name: 'weight',
           value: localData.weight,
           onChange: handleChange,
-          min: '30',
-          max: '200',
+          inputMode: 'numeric',
+          pattern: '[0-9]*',
           className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
         })
       ),

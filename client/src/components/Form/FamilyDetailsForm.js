@@ -265,12 +265,13 @@ const FamilyDetailsForm = ({ formData, updateFormData }) => {
                   'Total Brothers'
                 ),
                 React.createElement('input', {
-                  type: 'number',
+                  type: 'text',
                   id: 'siblings.brothers.total',
                   name: 'siblings.brothers.total',
                   value: localData.siblings.brothers.total,
                   onChange: handleChange,
-                  min: '0',
+                  inputMode: 'numeric',
+                  pattern: '[0-9]*',
                   className: 'w-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
                 })
               ),
@@ -285,12 +286,13 @@ const FamilyDetailsForm = ({ formData, updateFormData }) => {
                   'Married Brothers'
                 ),
                 React.createElement('input', {
-                  type: 'number',
+                  type: 'text',
                   id: 'siblings.brothers.married',
                   name: 'siblings.brothers.married',
                   value: localData.siblings.brothers.married,
                   onChange: handleChange,
-                  min: '0',
+                  inputMode: 'numeric',
+                  pattern: '[0-9]*',
                   className: 'w-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
                 })
               )
@@ -319,12 +321,13 @@ const FamilyDetailsForm = ({ formData, updateFormData }) => {
                   'Total Sisters'
                 ),
                 React.createElement('input', {
-                  type: 'number',
+                  type: 'text',
                   id: 'siblings.sisters.total',
                   name: 'siblings.sisters.total',
                   value: localData.siblings.sisters.total,
                   onChange: handleChange,
-                  min: '0',
+                  inputMode: 'numeric',
+                  pattern: '[0-9]*',
                   className: 'w-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
                 })
               ),
@@ -339,12 +342,13 @@ const FamilyDetailsForm = ({ formData, updateFormData }) => {
                   'Married Sisters'
                 ),
                 React.createElement('input', {
-                  type: 'number',
+                  type: 'text',
                   id: 'siblings.sisters.married',
                   name: 'siblings.sisters.married',
                   value: localData.siblings.sisters.married,
                   onChange: handleChange,
-                  min: '0',
+                  inputMode: 'numeric',
+                  pattern: '[0-9]*',
                   className: 'w-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
                 })
               )

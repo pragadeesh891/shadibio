@@ -39,9 +39,14 @@ const EducationProfessionForm = ({ formData, updateFormData }) => {
   }, [formData, hasHydrated]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    let updatedData;
+    let { name, value } = e.target;
 
+    // Numeric validation for amount
+    if (name === 'annualIncome.amount') {
+      value = value.replace(/[^0-9]/g, '');
+    }
+
+    let updatedData;
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
       updatedData = {
@@ -370,12 +375,13 @@ const EducationProfessionForm = ({ formData, updateFormData }) => {
                 React.createElement('option', { value: 'GBP' }, 'GBP')
               ),
               React.createElement('input', {
-                type: 'number',
+                type: 'text',
                 id: 'annualIncome.amount',
                 name: 'annualIncome.amount',
                 value: localData.annualIncome.amount,
                 onChange: handleChange,
-                min: '0',
+                inputMode: 'numeric',
+                pattern: '[0-9]*',
                 className: 'flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               })
             )
