@@ -267,7 +267,10 @@ const generatePDF = async (req, res) => {
       );
     } catch (pdfError) {
       console.error('PDF Generation Engine Error:', pdfError);
-      return res.status(500).json({ success: false, message: 'PDF Engine Error' });
+      return res.status(500).json({
+        success: false,
+        message: `PDF Engine Error: ${pdfError.message}. This usually means the server is missing Chromium dependencies. Please try again or contact support.`
+      });
     }
 
     // Set response headers for PDF download

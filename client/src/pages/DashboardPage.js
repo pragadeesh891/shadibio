@@ -146,9 +146,15 @@ const DashboardPage = () => {
         a.click();
         window.URL.revokeObjectURL(url);
         setMessage({ type: 'success', text: 'PDF Downloaded! 📄 The PDF is password protected. Use your birthdate (DDMMYYYY) to open it.' });
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        setMessage({ type: 'error', text: errorData.message || 'Server failed to generate PDF. If you just updated your profile, please wait 10 seconds and try again.' });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to download PDF' });
+      console.error('PDF Download Error:', error);
+      setMessage({ type: 'error', text: 'Network error while downloading PDF. Please check your connection.' });
+    } finally {
+      setSaving(false); // Reuse saving state as a loading indicator
     }
   };
 
