@@ -80,11 +80,12 @@ const DashboardPage = () => {
   ];
 
   const navTabs = [
-    { id: 'create', name: t('Create') || 'Create', icon: '✏️', desc: t('Build your biodata') || 'Build your biodata' },
-    { id: 'preview', name: t('Preview') || 'Preview', icon: '👁️', desc: t('See how it looks') || 'See how it looks' },
-    { id: 'customize', name: t('Customize') || 'Customize', icon: '🎨', desc: t('Style it') || 'Style it' },
-    { id: 'privacy', name: t('Privacy') || 'Privacy', icon: '🔒', desc: t('Control visibility') || 'Control visibility' },
-    { id: 'profile', name: t('profile') || 'Profile', icon: '👤', desc: t('Manage profile') || 'Manage profile' },
+    { id: 'create', name: t('Create') || 'Create', icon: '✏️', desc: 'Build your biodata' },
+    { id: 'preview', name: t('Preview') || 'Preview', icon: '👁️', desc: 'See how it looks' },
+    { id: 'customize', name: t('Customize') || 'Customize', icon: '🎨', desc: 'Style it' },
+    { id: 'privacy', name: t('Privacy') || 'Privacy', icon: '🔒', desc: 'Control visibility' },
+    { id: 'history', name: 'History', icon: '📜', desc: 'Version history' },
+    { id: 'profile', name: t('profile') || 'Profile', icon: '👤', desc: 'Manage profile' },
   ];
 
   useEffect(() => {
@@ -202,7 +203,10 @@ const DashboardPage = () => {
         React.createElement('div', { className: 'dash-avatar' }, userInitials),
         React.createElement('div', { className: 'dash-sidebar-profile-info' },
           React.createElement('p', { className: 'dash-sidebar-name' }, user?.name || 'Welcome'),
-          React.createElement('span', { className: 'dash-sidebar-badge' }, '✦ Premium')
+          React.createElement('span', {
+            className: 'dash-sidebar-badge',
+            style: user?.isPremium ? { background: 'linear-gradient(135deg,#f59e0b,#d97706)', color: 'white' } : {}
+          }, user?.isPremium ? '⭐ Premium' : '✦ Free')
         )
       ),
 
@@ -219,8 +223,16 @@ const DashboardPage = () => {
         )
       ),
 
-      // Bottom: Logout
+      // Bottom: Admin link + Logout
       React.createElement('div', { className: 'dash-sidebar-footer' },
+        user?.isPremium && React.createElement('button', {
+          className: 'dash-logout-btn',
+          style: { marginBottom: '8px', background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', color: 'white' },
+          onClick: () => navigate('/admin')
+        },
+          React.createElement('span', null, '🛡️'),
+          React.createElement('span', null, 'Admin Panel')
+        ),
         React.createElement('button', { className: 'dash-logout-btn', onClick: handleLogout },
           React.createElement('span', null, '🚪'),
           React.createElement('span', null, t('Logout') || 'Logout')
@@ -393,6 +405,46 @@ const DashboardPage = () => {
                 if (biodata) biodataService.updateBiodata(biodata._id, data);
               }
             })
+          )
+        ),
+
+        // HISTORY tab
+        activeTab === 'history' && React.createElement(
+          'div', { className: 'dash-single-col' },
+          React.createElement('div', { className: 'dash-card' },
+            React.createElement('div', { className: 'dash-card-header' },
+              React.createElement('h2', { className: 'dash-card-title' }, '📜 Version History'),
+              React.createElement('p', { className: 'dash-card-subtitle' }, 'Snapshots of your biodata saved automatically on each edit')
+            ),
+            biodata && biodata.history && biodata.history.length > 0
+              ? React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px' } },
+                [...biodata.history].reverse().map((entry, i) =>
+                  React.createElement('div', {
+                    key: i,
+                    style: { border: '1px solid #e5e7eb', borderRadius: '12px', padding: '16px', background: '#f9fafb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }
+                  },
+                    React.createElement('div', null,
+                      React.createElement('p', { style: { fontWeight: 'bold', color: '#374151' } },
+                        'Version ' + (biodata.history.length - i)
+                      ),
+                      React.createElement('p', { style: { fontSize: '13px', color: '#6b7280', marginTop: '4px' } },
+                        '🕒 Saved: ' + new Date(entry.savedAt).toLocaleString()
+                      ),
+                      React.createElement('p', { style: { fontSize: '13px', color: '#9ca3af', marginTop: '2px' } },
+                        entry.snapshot?.personalDetails?.fullName || 'Unnamed Biodata'
+                      )
+                    ),
+                    React.createElement('span', {
+                      style: { background: '#ede9fe', color: '#7c3aed', padding: '4px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: '600' }
+                    }, i === 0 ? 'Latest Backup' : `Backup ${biodata.history.length - i}`)
+                  )
+                )
+              )
+              : React.createElement('div', { className: 'dash-empty-state' },
+                React.createElement('div', { className: 'dash-empty-icon' }, '📜'),
+                React.createElement('h3', { className: 'dash-empty-title' }, 'No history yet'),
+                React.createElement('p', { className: 'dash-empty-desc' }, 'Version snapshots appear here automatically each time you edit and save your biodata.')
+              )
           )
         ),
 
