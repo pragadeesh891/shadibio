@@ -7,7 +7,7 @@ const biodataSchema = new mongoose.Schema({
     required: [true, 'User ID is required'],
     index: true
   },
-  
+
   // Personal Details
   personalDetails: {
     fullName: {
@@ -191,6 +191,13 @@ const biodataSchema = new mongoose.Schema({
     min: 0,
     max: 100
   },
+  history: [{
+    snapshot: Object,
+    savedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
 
   // Timestamps
   createdAt: {
@@ -204,7 +211,7 @@ const biodataSchema = new mongoose.Schema({
 });
 
 // Update updatedAt before saving
-biodataSchema.pre('save', function(next) {
+biodataSchema.pre('save', function (next) {
   this.updatedAt = Date.now();
   next();
 });
@@ -214,7 +221,7 @@ biodataSchema.index({ userId: 1 });
 biodataSchema.index({ createdAt: -1 });
 
 // Calculate profile completion percentage
-biodataSchema.methods.calculateCompletion = function() {
+biodataSchema.methods.calculateCompletion = function () {
   const requiredFields = [
     'personalDetails.fullName',
     'personalDetails.dateOfBirth',
@@ -228,7 +235,7 @@ biodataSchema.methods.calculateCompletion = function() {
   ];
 
   let completedFields = 0;
-  
+
   requiredFields.forEach(field => {
     const value = this.get(field);
     if (value && value.toString().trim() !== '') {
@@ -241,17 +248,17 @@ biodataSchema.methods.calculateCompletion = function() {
 };
 
 // Auto-calculate age from date of birth
-biodataSchema.pre('save', function(next) {
+biodataSchema.pre('save', function (next) {
   if (this.personalDetails && this.personalDetails.dateOfBirth) {
     const today = new Date();
     const birthDate = new Date(this.personalDetails.dateOfBirth);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-    
+
     this.personalDetails.age = age;
   }
   next();

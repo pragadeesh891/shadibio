@@ -4,7 +4,7 @@ const pdf = require('html-pdf-node');
 const getProfilePhoto = (biodata) => biodata?.profilePhoto || biodata?.personalDetails?.profilePhoto || null;
 
 // Template functions for PDF generation
-const generateTraditionalTemplate = (biodata, customization = {}) => {
+const generateTraditionalTemplate = (biodata, customization = {}, isPremium = false) => {
   const { primaryColor = '#3B82F6', secondaryColor = '#1E40AF', fontFamily = 'Arial' } = customization;
 
   const personalDetails = biodata?.personalDetails || {};
@@ -105,9 +105,22 @@ const generateTraditionalTemplate = (biodata, customization = {}) => {
           font-size: 12px;
           color: #6b7280;
         }
+        .watermark {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%) rotate(-45deg);
+          font-size: 100px;
+          color: rgba(200, 200, 200, 0.3);
+          z-index: 9999;
+          pointer-events: none;
+          white-space: nowrap;
+          font-weight: bold;
+        }
       </style>
     </head>
     <body>
+      ${!isPremium ? '<div class="watermark">ShadiBio.com Free</div>' : ''}
       <div class="header">
         <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 15px;">
           <div style="width: 64px; height: 64px; border: 4px solid ${secondaryColor}; border-radius: 50%; margin: 0 20px; display: flex; align-items: center; justify-content: center;">
@@ -237,7 +250,7 @@ const generateTraditionalTemplate = (biodata, customization = {}) => {
   `;
 };
 
-const generateModernTemplate = (biodata, customization = {}) => {
+const generateModernTemplate = (biodata, customization = {}, isPremium = false) => {
   const { primaryColor = '#3B82F6', secondaryColor = '#1E40AF', fontFamily = 'Arial' } = customization;
 
   const personalDetails = biodata?.personalDetails || {};
@@ -365,9 +378,22 @@ const generateModernTemplate = (biodata, customization = {}) => {
           text-align: center;
           font-size: 14px;
         }
+        .watermark {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%) rotate(-45deg);
+          font-size: 100px;
+          color: rgba(0, 0, 0, 0.1);
+          z-index: 9999;
+          pointer-events: none;
+          white-space: nowrap;
+          font-weight: bold;
+        }
       </style>
     </head>
     <body>
+      ${!isPremium ? '<div class="watermark">ShadiBio.com Free</div>' : ''}
       <div class="container">
         <div class="header">
           <h1>MARRIAGE BIO-DATA</h1>
@@ -497,14 +523,14 @@ const generateModernTemplate = (biodata, customization = {}) => {
 };
 
 // Main PDF generation function
-const generateBiodataPDF = async (biodata, template = 'Traditional', customization = {}) => {
+const generateBiodataPDF = async (biodata, template = 'Traditional', customization = {}, isPremium = false) => {
   try {
     let htmlContent;
 
     if (template === 'Modern') {
-      htmlContent = generateModernTemplate(biodata, customization);
+      htmlContent = generateModernTemplate(biodata, customization, isPremium);
     } else {
-      htmlContent = generateTraditionalTemplate(biodata, customization);
+      htmlContent = generateTraditionalTemplate(biodata, customization, isPremium);
     }
 
     const options = {

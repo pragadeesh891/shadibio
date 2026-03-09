@@ -14,13 +14,23 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      // Simulate password reset email (in production, this would call your backend)
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // In production: await authService.forgotPassword({ email });
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/auth/forgotpassword`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to send reset email');
+      }
+
       setSuccess(true);
+      // Optional: console.log(data.resetToken) for dev testing since we are not sending emails setup
+      console.log('Reset token for testing:', data.resetToken);
     } catch (err) {
-      setError('Failed to send reset email. Please try again.');
+      setError(err.message || 'Failed to send reset email. Please try again.');
     } finally {
       setLoading(false);
     }

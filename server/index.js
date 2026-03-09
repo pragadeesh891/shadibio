@@ -56,6 +56,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/biodata', require('./routes/biodata'));
 app.use('/api/chatbot', require('./routes/chatbot'));
+app.use('/api/admin', require('./routes/admin'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {

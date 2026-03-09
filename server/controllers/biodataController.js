@@ -19,7 +19,7 @@ const createBiodata = async (req, res) => {
     // Create new biodata
     const biodata = new Biodata(biodataData);
     biodata.calculateCompletion();
-    
+
     await biodata.save();
 
     res.status(201).json({
@@ -32,7 +32,7 @@ const createBiodata = async (req, res) => {
 
   } catch (error) {
     console.error('Create biodata error:', error);
-    
+
     // Handle validation errors
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map(err => err.message);
@@ -53,7 +53,7 @@ const createBiodata = async (req, res) => {
 const getUserBiodata = async (req, res) => {
   try {
     const biodata = await Biodata.findOne({ userId: req.user._id });
-    
+
     if (!biodata) {
       return res.status(404).json({
         success: false,
@@ -84,9 +84,9 @@ const updateBiodata = async (req, res) => {
     const updateData = req.body;
 
     // Find biodata and check ownership
-    const biodata = await Biodata.findOne({ 
-      _id: id, 
-      userId: req.user._id 
+    const biodata = await Biodata.findOne({
+      _id: id,
+      userId: req.user._id
     });
 
     if (!biodata) {
@@ -96,9 +96,15 @@ const updateBiodata = async (req, res) => {
       });
     }
 
+    // Add current state to history
+    biodata.history.push({
+      snapshot: biodata.toObject(),
+      savedAt: Date.now()
+    });
+
     // Update biodata
     Object.keys(updateData).forEach(key => {
-      if (key !== 'userId') { // Prevent userId modification
+      if (key !== 'userId' && key !== 'history') { // Prevent userId and history modification
         biodata[key] = updateData[key];
       }
     });
@@ -116,7 +122,7 @@ const updateBiodata = async (req, res) => {
 
   } catch (error) {
     console.error('Update biodata error:', error);
-    
+
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map(err => err.message);
       return res.status(400).json({
@@ -137,9 +143,9 @@ const deleteBiodata = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const biodata = await Biodata.findOneAndDelete({ 
-      _id: id, 
-      userId: req.user._id 
+    const biodata = await Biodata.findOneAndDelete({
+      _id: id,
+      userId: req.user._id
     });
 
     if (!biodata) {
@@ -167,9 +173,9 @@ const deleteBiodata = async (req, res) => {
 const getBiodataById = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const biodata = await Biodata.findById(id).populate('userId', 'name email');
-    
+
     if (!biodata) {
       return res.status(404).json({
         success: false,
@@ -179,15 +185,15 @@ const getBiodataById = async (req, res) => {
 
     // Apply privacy settings
     const sanitizedBiodata = { ...biodata.toObject() };
-    
+
     if (sanitizedBiodata.privacySettings?.hidePhone) {
       delete sanitizedBiodata.personalDetails.phone;
     }
-    
+
     if (sanitizedBiodata.privacySettings?.hideEmail) {
       delete sanitizedBiodata.personalDetails.email;
     }
-    
+
     if (sanitizedBiodata.privacySettings?.hideIncome) {
       delete sanitizedBiodata.educationDetails.annualIncome;
     }
@@ -216,7 +222,7 @@ const generatePDF = async (req, res) => {
 
     // Get biodata
     const biodata = await Biodata.findById(id);
-    
+
     if (!biodata) {
       return res.status(404).json({
         success: false,
@@ -226,26 +232,26 @@ const generatePDF = async (req, res) => {
 
     // Apply privacy settings for PDF
     const sanitizedBiodata = { ...biodata.toObject() };
-    
+
     if (sanitizedBiodata.privacySettings?.hidePhone) {
       delete sanitizedBiodata.personalDetails.phone;
     }
-    
+
     if (sanitizedBiodata.privacySettings?.hideEmail) {
       delete sanitizedBiodata.personalDetails.email;
     }
-    
+
     if (sanitizedBiodata.privacySettings?.hideIncome) {
       delete sanitizedBiodata.educationDetails.annualIncome;
     }
 
     // Generate PDF
-    const pdfBuffer = await generateBiodataPDF(sanitizedBiodata, template, customization);
+    const pdfBuffer = await generateBiodataPDF(sanitizedBiodata, template, customization, req.user?.isPremium);
 
     // Set response headers for PDF download
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=biodata_${biodata.personalDetails.fullName.replace(/\s+/g, '_')}.pdf`);
-    
+
     // Send PDF buffer
     res.send(pdfBuffer);
 

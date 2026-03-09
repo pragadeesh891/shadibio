@@ -7,8 +7,10 @@ import HomePage from './pages/HomePage';
 import LoginPage from './components/Auth/LoginPage';
 import RegisterPage from './components/Auth/RegisterPage';
 import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import DashboardPage from './pages/DashboardPage';
 import HoroscopeMatchPage from './pages/HoroscopeMatchPage';
+import AdminDashboard from './pages/AdminDashboard';
 import ChatBot from './components/ChatBot/ChatBot';
 import './App.css';
 
@@ -32,6 +34,8 @@ function App() {
             React.createElement(Route, { path: '/login', element: React.createElement(LoginPage, null) }),
             React.createElement(Route, { path: '/register', element: React.createElement(RegisterPage, null) }),
             React.createElement(Route, { path: '/forgot-password', element: React.createElement(ForgotPassword, null) }),
+            React.createElement(Route, { path: '/reset-password/:token', element: React.createElement(ResetPassword, null) }),
+            React.createElement(Route, { path: '/admin', element: React.createElement(AdminDashboard, null) }),
             React.createElement(Route, { path: '/match', element: React.createElement(HoroscopeMatchPage, null) }),
             React.createElement(Route, {
               path: '/dashboard',
