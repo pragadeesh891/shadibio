@@ -185,6 +185,12 @@ const DashboardPage = () => {
       React.createElement('div', { className: 'dash-blob dash-blob-3' })
     ),
 
+    // ── Mobile Overlay ────────────────────────────────────────────────────
+    mobileNavOpen && React.createElement('div', {
+      className: 'dash-overlay animate-fade-in',
+      onClick: () => setMobileNavOpen(false)
+    }),
+
     // ── Side Navigation ───────────────────────────────────────────────────
     React.createElement(
       'aside', { className: `dash-sidebar ${mobileNavOpen ? 'dash-sidebar-open' : ''}` },
