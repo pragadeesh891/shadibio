@@ -190,23 +190,23 @@ const HomePage = () => {
     React.createElement('div', { className: 'relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32' },
       React.createElement('div', { className: 'text-center' },
         React.createElement('h1', {
-          className: 'text-6xl md:text-8xl font-black text-white mb-8 drop-shadow-2xl animate-slide-up',
+          className: 'text-4xl sm:text-6xl md:text-8xl font-black text-white mb-6 md:mb-8 drop-shadow-2xl animate-slide-up',
           style: { textShadow: '0 0 40px rgba(255,255,255,0.5)' }
         }, t('heroTitle')),
-        React.createElement('p', { className: 'text-2xl text-white mb-12 font-light animate-fade-in' },
+        React.createElement('p', { className: 'text-lg sm:text-2xl text-white mb-8 md:mb-12 font-light animate-fade-in' },
           t('heroSubtitle')),
-        React.createElement('div', { className: 'flex justify-center space-x-6 animate-scale-in' },
+        React.createElement('div', { className: 'flex flex-col md:flex-row justify-center items-stretch md:items-center space-y-4 md:space-y-0 md:space-x-6 animate-scale-in px-4 max-w-md mx-auto md:max-w-none' },
           React.createElement('button', {
             onClick: () => navigate('/match'),
-            className: 'px-10 py-5 bg-gradient-to-r from-pink-500 to-yellow-500 text-white rounded-3xl font-bold text-xl shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 border-2 border-transparent'
+            className: 'px-6 py-4 md:px-10 md:py-5 bg-gradient-to-r from-pink-500 to-yellow-500 text-white rounded-2xl md:rounded-3xl font-bold text-lg md:text-xl shadow-2xl hover:shadow-3xl transform hover:scale-105 md:hover:scale-110 transition-all duration-300 border-2 border-transparent w-full md:w-auto flex items-center justify-center'
           }, 'Match Horoscope ✨'),
           React.createElement('button', {
             onClick: () => navigate('/register'),
-            className: 'px-10 py-5 bg-white text-indigo-600 rounded-3xl font-bold text-xl shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300'
+            className: 'px-6 py-4 md:px-10 md:py-5 bg-white text-indigo-600 rounded-2xl md:rounded-3xl font-bold text-lg md:text-xl shadow-2xl hover:shadow-3xl transform hover:scale-105 md:hover:scale-110 transition-all duration-300 w-full md:w-auto flex items-center justify-center'
           }, t('startFree')),
           React.createElement('button', {
             onClick: () => navigate('/#features'),
-            className: 'px-10 py-5 glass-dark text-white rounded-3xl font-bold text-xl border-2 border-white hover:bg-white hover:text-indigo-600 transition-all duration-300'
+            className: 'px-6 py-4 md:px-10 md:py-5 glass-dark text-white rounded-2xl md:rounded-3xl font-bold text-lg md:text-xl border-2 border-white hover:bg-white hover:text-indigo-600 transition-all duration-300 w-full md:w-auto flex items-center justify-center'
           }, t('learnMore'))
         )
       )
