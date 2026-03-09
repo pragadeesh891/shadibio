@@ -7,216 +7,130 @@ try {
   console.warn('muhammara module not found. PDF password protection will be disabled.');
 }
 
-// Helper: get profile photo from biodata
 const getProfilePhoto = (biodata) => biodata?.profilePhoto || biodata?.personalDetails?.profilePhoto || null;
 
-// Helper: Convert image URL to Base64 for faster rendering
 const getBase64Image = async (url) => {
   if (!url || url.startsWith('data:')) return url;
   try {
-    const response = await axios.get(url, { responseType: 'arraybuffer', timeout: 5000 });
+    const response = await axios.get(url, { responseType: 'arraybuffer', timeout: 2000 });
     const b64 = Buffer.from(response.data, 'binary').toString('base64');
     const mimeType = response.headers['content-type'] || 'image/jpeg';
     return `data:${mimeType};base64,${b64}`;
   } catch (err) {
-    console.warn('Failed to fetch image for PDF Base64 conversion:', err.message);
-    return url; // Fallback to original URL
+    console.warn('PDF Speed-Gen Image Error:', err.message);
+    return url;
   }
 };
 
-// Template functions for PDF generation
 const generateTraditionalTemplate = (biodata, customization = {}, isPremium = false, profilePhotoB64 = null) => {
   const { primaryColor = '#3B82F6', secondaryColor = '#1E40AF', fontFamily = 'Arial' } = customization;
-
-  const personalDetails = biodata?.personalDetails || {};
-  const familyDetails = biodata?.familyDetails || {};
-  const educationDetails = biodata?.educationDetails || {};
-  const horoscopeDetails = biodata?.horoscopeDetails || {};
-
-  // Helper functions
-  const getNestedValue = (obj, path) => {
-    return path.split('.').reduce((current, prop) => current?.[prop], obj);
-  };
-
-  const hidePhone = getNestedValue(biodata, 'privacySettings.hidePhone');
-  const hideEmail = getNestedValue(biodata, 'privacySettings.hideEmail');
-  const hideIncome = getNestedValue(biodata, 'privacySettings.hideIncome');
-
-  const age = personalDetails.age || (personalDetails.dateOfBirth ?
-    new Date().getFullYear() - new Date(personalDetails.dateOfBirth).getFullYear() : null);
-
-  const photoToUse = profilePhotoB64 || getProfilePhoto(biodata);
+  const pd = biodata?.personalDetails || {};
+  const fd = biodata?.familyDetails || {};
+  const ed = biodata?.educationDetails || {};
+  const hd = biodata?.horoscopeDetails || {};
+  const age = pd.age || (pd.dateOfBirth ? new Date().getFullYear() - new Date(pd.dateOfBirth).getFullYear() : '');
+  const photo = profilePhotoB64 || getProfilePhoto(biodata);
 
   return `
-    <!DOCTYPE html>
     <html>
-    <head>
-      <meta charset="utf-8">
-      <style>
-        body { font-family: ${fontFamily}; margin: 0; padding: 20px; line-height: 1.4; color: #333; }
-        .header { border-bottom: 4px solid #111827; padding-bottom: 20px; margin-bottom: 30px; text-align: center; }
-        .title { color: ${secondaryColor}; font-size: 28px; font-weight: bold; margin: 10px 0; }
-        .main-content { display: flex; gap: 30px; }
-        .left-column { flex: 1; text-align: center; }
-        .right-column { flex: 2; }
-        .profile-photo { width: 180px; height: 180px; border-radius: 50%; border: 4px solid #374151; margin: 0 auto 20px; display: block; }
-        .section { margin-bottom: 25px; border-left: 4px solid ${primaryColor}; padding-left: 15px; }
-        .section-title { color: ${secondaryColor}; font-size: 18px; font-weight: bold; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 2px solid ${primaryColor}; }
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 14px; }
-        .info-item { margin-bottom: 5px; }
-        .label { font-weight: bold; color: #4b5563; }
-        .value { color: #6b7280; }
-        .footer { border-top: 4px solid #111827; padding-top: 20px; margin-top: 30px; text-align: center; font-size: 12px; color: #6b7280; }
-        .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 100px; color: rgba(200, 200, 200, 0.3); z-index: 9999; pointer-events: none; white-space: nowrap; font-weight: bold; }
-      </style>
-    </head>
+    <head><style>
+      body { font-family: ${fontFamily}; margin: 0; padding: 25px; color: #333; line-height: 1.4; }
+      .header { text-align: center; border-bottom: 3px solid ${primaryColor}; padding-bottom: 15px; margin-bottom: 25px; }
+      .header h1 { margin: 0; color: ${secondaryColor}; font-size: 28px; }
+      .main { display: flex; gap: 30px; }
+      .sidebar { flex: 1; text-align: center; }
+      .content { flex: 2.2; }
+      .photo { width: 160px; height: 160px; border-radius: 50%; border: 4px solid ${primaryColor}; object-fit: cover; margin-bottom: 15px; }
+      .section { margin-bottom: 20px; border-left: 4px solid ${primaryColor}; padding-left: 15px; }
+      .section-title { color: ${secondaryColor}; font-weight: bold; font-size: 18px; border-bottom: 1px solid #eee; margin-bottom: 10px; padding-bottom: 3px; }
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 14px; }
+      .label { font-weight: bold; color: #555; }
+      .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 90px; color: rgba(0,0,0,0.05); z-index: -1; font-weight: bold; }
+    </style></head>
     <body>
-      ${!isPremium ? '<div class="watermark">ShadiBio.com Free</div>' : ''}
-      <div class="header">
-        <h1 class="title">MARRIAGE BIO-DATA</h1>
-      </div>
-
-      <div class="main-content">
-        <div class="left-column">
-          ${photoToUse ? `
-            <div style="text-align:center; margin-bottom: 16px;">
-              <img src="${photoToUse}" style="width:160px;height:160px;border-radius:50%;border:4px solid ${secondaryColor};object-fit:cover;display:block;margin:0 auto;">
-            </div>` :
-      `<div style="width:160px;height:160px;border-radius:50%;background:linear-gradient(135deg,${primaryColor},${secondaryColor});display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:48px;">👤</div>`
-    }
-          <h2 style="color: ${secondaryColor}; font-size: 20px; margin: 10px 0;">${personalDetails.fullName || 'Name not provided'}</h2>
-          <p style="color: #4b5563; margin: 5px 0;">${personalDetails.gender ? `${age ? `${age} years, ` : ''}${personalDetails.gender}` : 'Age and gender not provided'}</p>
+      ${!isPremium ? '<div class="watermark">ShadiBio.com FREE</div>' : ''}
+      <div class="header"><h1>MARRIAGE BIO-DATA</h1></div>
+      <div class="main">
+        <div class="sidebar">
+          ${photo ? `<img src="${photo}" class="photo">` : `<div style="width:150px;height:150px;border-radius:50%;background:#eee;margin:0 auto 15px;display:flex;align-items:center;justify-content:center;font-size:50px;">👤</div>`}
+          <h2 style="margin:5px 0;">${pd.fullName || ''}</h2>
+          <p>${age ? age + ' yrs, ' : ''}${pd.gender || ''}</p>
+          <div style="font-size:13px; margin-top:10px;">
+            ${pd.phone && !biodata?.privacySettings?.hidePhone ? `<p>📞 ${pd.phone}</p>` : ''}
+            ${pd.email && !biodata?.privacySettings?.hideEmail ? `<p>📧 ${pd.email}</p>` : ''}
+          </div>
         </div>
-
-        <div class="right-column">
+        <div class="content">
           <div class="section">
-            <h3 class="section-title">Personal Information</h3>
-            <div class="info-grid">
-              <div class="info-item"><span class="label">Marital Status:</span> <span class="value">${personalDetails.maritalStatus || 'Not specified'}</span></div>
-              <div class="info-item"><span class="label">Height:</span> <span class="value">${personalDetails.height?.feet || personalDetails.height?.inches ? `${personalDetails.height.feet}'${personalDetails.height.inches || 0}"` : 'Not specified'}</span></div>
-              <div class="info-item"><span class="label">Weight:</span> <span class="value">${personalDetails.weight ? `${personalDetails.weight} kg` : 'Not specified'}</span></div>
-              <div class="info-item"><span class="label">Blood Group:</span> <span class="value">${personalDetails.bloodGroup || 'Not specified'}</span></div>
+            <div class="section-title">Personal Details</div>
+            <div class="grid">
+              <div><span class="label">Status:</span> ${pd.maritalStatus || 'N/A'}</div>
+              <div><span class="label">Height:</span> ${pd.height?.feet || 0}'${pd.height?.inches || 0}"</div>
+              <div><span class="label">Weight:</span> ${pd.weight || 'N/A'} kg</div>
+              <div><span class="label">Blood:</span> ${pd.bloodGroup || 'N/A'}</div>
+              <div><span class="label">Complexion:</span> ${pd.complexion || 'N/A'}</div>
+              <div><span class="label">Religion:</span> ${pd.religion || 'N/A'}</div>
+            </div>
+            ${pd.address?.city ? `<p style="margin:10px 0 0;font-size:14px;"><span class="label">� Address:</span> ${pd.address.city}, ${pd.address.state}</p>` : ''}
+          </div>
+          <div class="section">
+            <div class="section-title">Family Background</div>
+            <div class="grid">
+              <div><span class="label">Father:</span> ${fd.father?.name || 'N/A'}</div>
+              <div><span class="label">Mother:</span> ${fd.mother?.name || 'N/A'}</div>
+              <div><span class="label">Siblings:</span> ${fd.siblings?.brothers?.total || 0} B, ${fd.siblings?.sisters?.total || 0} S</div>
+              <div><span class="label">Type:</span> ${fd.familyType || 'N/A'}</div>
             </div>
           </div>
-
           <div class="section">
-            <h3 class="section-title">Education & Profession</h3>
-            <div class="info-item"><span class="label">🎓 Education:</span> <span class="value">${educationDetails.highestEducation || 'Not specified'}</span></div>
-            ${educationDetails.occupation ? `<div class="info-item"><span class="label">💼 Occupation:</span> <span class="value">${educationDetails.occupation}</span></div>` : ''}
+            <div class="section-title">Education & Profession</div>
+            <p style="font-size:14px;margin:5px 0;"><b>Education:</b> ${ed.highestEducation || 'N/A'}${ed.specialization ? ' (' + ed.specialization + ')' : ''}</p>
+            <p style="font-size:14px;margin:5px 0;"><b>Occupation:</b> ${ed.occupation || 'N/A'}${ed.companyName ? ' at ' + ed.companyName : ''}</p>
+            ${ed.annualIncome?.amount && !biodata?.privacySettings?.hideIncome ? `<p style="font-size:14px;margin:5px 0;"><b>Income:</b> ${ed.annualIncome.currency} ${ed.annualIncome.amount}</p>` : ''}
           </div>
-          
-          ${horoscopeDetails.rashi || horoscopeDetails.nakshatra ? `
-            <div class="section">
-              <h3 class="section-title">Horoscope</h3>
-              <div class="info-grid">
-                ${horoscopeDetails.rashi ? `<div class="info-item"><span class="label">🌙 Rashi:</span> <span class="value">${horoscopeDetails.rashi}</span></div>` : ''}
-                ${horoscopeDetails.nakshatra ? `<div class="info-item"><span class="label">⭐ Nakshatra:</span> <span class="value">${horoscopeDetails.nakshatra}</span></div>` : ''}
-              </div>
-            </div>` : ''}
+          ${hd.rashi || hd.nakshatra ? `
+          <div class="section">
+            <div class="section-title">Horoscope</div>
+            <div class="grid">
+              <div><span class="label">Rashi:</span> ${hd.rashi || 'N/A'}</div>
+              <div><span class="label">Nakshatra:</span> ${hd.nakshatra || 'N/A'}</div>
+              <div><span class="label">Gotra:</span> ${hd.gotra || 'N/A'}</div>
+              <div><span class="label">Manglik:</span> ${hd.manglik || 'N/A'}</div>
+            </div>
+          </div>` : ''}
         </div>
       </div>
-      <div class="footer">
-        <p>Generated by ShadiBio - Professional Marriage Biodata Platform</p>
-      </div>
-    </body>
-    </html>
+      <div style="text-align:center;font-size:10px;color:#999;margin-top:20px;">ShadiBio.com - Create your professional biodata in minutes</div>
+    </body></html>
   `;
 };
 
 const generateModernTemplate = (biodata, customization = {}, isPremium = false, profilePhotoB64 = null) => {
-  const { primaryColor = '#3B82F6', secondaryColor = '#1E40AF', fontFamily = 'Arial' } = customization;
-
-  const personalDetails = biodata?.personalDetails || {};
-  const educationDetails = biodata?.educationDetails || {};
-
-  const hideIncome = biodata?.privacySettings?.hideIncome;
-  const age = personalDetails.age || (personalDetails.dateOfBirth ?
-    new Date().getFullYear() - new Date(personalDetails.dateOfBirth).getFullYear() : null);
-
-  const photoToUse = profilePhotoB64 || getProfilePhoto(biodata);
-
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <style>
-        body { font-family: ${fontFamily}; margin: 0; padding: 30px; line-height: 1.5; color: #333; background: #f3f4f6; }
-        .container { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .header { background: ${primaryColor}; color: white; padding: 30px; text-align: center; }
-        .content { padding: 30px; display: flex; gap: 30px; }
-        .left-column { flex: 1; text-align: center; }
-        .right-column { flex: 2; }
-        .card { background: #f9fafb; border-radius: 12px; padding: 20px; margin-bottom: 20px; border-left: 4px solid ${primaryColor}; }
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .label { font-weight: bold; color: #4b5563; display: block; }
-        .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 80px; color: rgba(0,0,0,0.05); z-index: 9999; pointer-events: none; font-weight: bold; }
-      </style>
-    </head>
-    <body>
-      ${!isPremium ? '<div class="watermark">ShadiBio.com Free</div>' : ''}
-      <div class="container">
-        <div class="header"><h1>MARRIAGE BIO-DATA</h1></div>
-        <div class="content">
-          <div class="left-column">
-            ${photoToUse ? `<img src="${photoToUse}" style="width:160px;height:160px;border-radius:16px;object-fit:cover;margin-bottom:15px;border:4px solid white;">` : ''}
-            <h2>${personalDetails.fullName || 'Name'}</h2>
-            <p>${age ? `${age} yrs, ` : ''}${personalDetails.gender || ''}</p>
-          </div>
-          <div class="right-column">
-            <div class="card">
-              <h3>Personal Info</h3>
-              <div class="info-grid">
-                <div><span class="label">Status:</span> ${personalDetails.maritalStatus || 'Not set'}</div>
-                <div><span class="label">Height:</span> ${personalDetails.height?.feet || 0}'${personalDetails.height?.inches || 0}"</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </body>
-    </html>
-  `;
+  return generateTraditionalTemplate(biodata, customization, isPremium, profilePhotoB64); // Fallback to optimized for now
 };
 
-// Main PDF generation function
 const generateBiodataPDF = async (biodata, template = 'Traditional', customization = {}, isPremium = false, pdfPassword = null) => {
   try {
-    // PRE-FETCH PHOTO TO BASE64 FOR SPEED
     const photoUrl = getProfilePhoto(biodata);
-    let profilePhotoB64 = null;
-    if (photoUrl) {
-      profilePhotoB64 = await getBase64Image(photoUrl);
-    }
-
-    let htmlContent;
-    if (template === 'Modern') {
-      htmlContent = generateModernTemplate(biodata, customization, isPremium, profilePhotoB64);
-    } else {
-      htmlContent = generateTraditionalTemplate(biodata, customization, isPremium, profilePhotoB64);
-    }
+    const profilePhotoB64 = photoUrl ? await getBase64Image(photoUrl) : null;
+    const htmlContent = generateTraditionalTemplate(biodata, customization, isPremium, profilePhotoB64);
 
     const options = {
       format: 'A4',
       printBackground: true,
-      margin: { top: '10px', bottom: '10px', left: '10px', right: '10px' },
+      margin: { top: '30px', bottom: '30px', left: '30px', right: '30px' },
       launchOptions: {
         headless: 'new',
         args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-gpu',
-          '--no-zygote',
-          '--single-process'
+          '--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage',
+          '--disable-gpu', '--no-zygote', '--single-process',
+          '--font-render-hinting=none', '--disable-extensions'
         ]
       }
     };
 
-    const file = { content: htmlContent };
-    let pdfBuffer = await pdf.generatePdf(file, options);
+    let pdfBuffer = await pdf.generatePdf({ content: htmlContent }, options);
 
-    // Add password protection
     if (pdfPassword && muhammara) {
       try {
         const inStream = new muhammara.PDFRStreamForBuffer(pdfBuffer);
@@ -227,20 +141,13 @@ const generateBiodataPDF = async (biodata, template = 'Traditional', customizati
           userPrivileges: { print: 'highQuality', modify: 'none', copy: 'none' }
         });
         pdfBuffer = outStream.getBuffer ? outStream.getBuffer() : outStream.buffer;
-      } catch (encryptError) {
-        console.error('Speed-PDF Encryption fallback:', encryptError);
-      }
+      } catch (e) { console.error('Encr Error:', e); }
     }
-
     return pdfBuffer;
   } catch (error) {
-    console.error('PDF Speed-Gen error:', error);
+    console.error('PDF error:', error);
     throw error;
   }
 };
 
-module.exports = {
-  generateBiodataPDF,
-  generateTraditionalTemplate,
-  generateModernTemplate
-};
+module.exports = { generateBiodataPDF };

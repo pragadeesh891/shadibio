@@ -15,51 +15,48 @@ const EducationProfessionForm = ({ formData, updateFormData }) => {
     workLocation: ''
   });
 
-  // Load data once when available, but avoid overwriting active typing
+  const [hasHydrated, setHasHydrated] = useState(false);
+
+  // Load data once when available
   useEffect(() => {
-    if (formData && formData.educationDetails) {
-      // Only auto-fill if the main fields are still empty (initial load)
-      const isInitialLoad = !localData.highestEducation && !localData.occupation;
-      if (isInitialLoad) {
-        setLocalData(prev => ({
-          ...prev,
-          ...formData.educationDetails,
-          annualIncome: {
-            amount: formData.educationDetails.annualIncome?.amount || '',
-            currency: formData.educationDetails.annualIncome?.currency || 'INR'
-          }
-        }));
-      }
+    if (formData?.educationDetails && !hasHydrated) {
+      const ed = formData.educationDetails;
+      setLocalData({
+        highestEducation: ed.highestEducation || '',
+        college: ed.college || '',
+        specialization: ed.specialization || '',
+        additionalQualifications: ed.additionalQualifications || [],
+        occupation: ed.occupation || '',
+        companyName: ed.companyName || '',
+        annualIncome: {
+          amount: ed.annualIncome?.amount || '',
+          currency: ed.annualIncome?.currency || 'INR'
+        },
+        workLocation: ed.workLocation || ''
+      });
+      setHasHydrated(true);
     }
-  }, [formData, localData.highestEducation, localData.occupation]);
+  }, [formData, hasHydrated]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    let updatedData;
 
-    // Handle nested fields
     if (name.includes('.')) {
-      const parts = name.split('.');
-
-      if (parts[0] === 'annualIncome') {
-        const field = parts[1];
-        const updatedAnnualIncome = { ...localData.annualIncome, [field]: value };
-        const updatedData = { ...localData, annualIncome: updatedAnnualIncome };
-
-        setLocalData(updatedData);
-        updateFormData({ educationDetails: updatedData });
-      } else {
-        const updatedData = { ...localData, [name]: value };
-
-        setLocalData(updatedData);
-        updateFormData({ educationDetails: updatedData });
-      }
+      const [parent, child] = name.split('.');
+      updatedData = {
+        ...localData,
+        [parent]: {
+          ...localData[parent],
+          [child]: value
+        }
+      };
     } else {
-      // Handle top-level fields
-      const updatedData = { ...localData, [name]: value };
-
-      setLocalData(updatedData);
-      updateFormData({ educationDetails: updatedData });
+      updatedData = { ...localData, [name]: value };
     }
+
+    setLocalData(updatedData);
+    updateFormData({ educationDetails: updatedData });
   };
 
   const handleQualificationsChange = (e) => {

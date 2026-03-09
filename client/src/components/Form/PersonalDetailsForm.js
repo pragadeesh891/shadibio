@@ -23,54 +23,59 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
     complexion: ''
   });
 
+  const [hasHydrated, setHasHydrated] = useState(false);
+
   // Load existing data when component mounts
   useEffect(() => {
-    if (formData && formData.personalDetails) {
-      setLocalData({
-        ...localData,
+    if (formData?.personalDetails && !hasHydrated) {
+      setLocalData(prev => ({
+        ...prev,
         ...formData.personalDetails,
-        dateOfBirth: formData.personalDetails.dateOfBirth || '',
-        age: formData.personalDetails.age || ''
-      });
+        address: { ...prev.address, ...(formData.personalDetails.address || {}) },
+        height: { ...prev.height, ...(formData.personalDetails.height || {}) }
+      }));
+      setHasHydrated(true);
     }
-  }, [formData]);
+  }, [formData, hasHydrated]);
 
   // Calculate age when date of birth changes
   useEffect(() => {
     if (localData.dateOfBirth) {
       const age = calculateAge(localData.dateOfBirth);
-      if (age !== null) {
+      if (age !== null && age !== localData.age) {
         const updatedData = { ...localData, age };
         setLocalData(updatedData);
         updateFormData({ personalDetails: updatedData });
       }
     }
-  }, [localData.dateOfBirth]);
+  }, [localData.dateOfBirth, localData.age, updateFormData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
-    // Handle nested address fields
-    if (name.startsWith('address.')) {
-      const field = name.split('.')[1];
-      const updatedAddress = { ...localData.address, [field]: value };
-      const updatedData = { ...localData, address: updatedAddress };
-      
-      setLocalData(updatedData);
-      updateFormData({ personalDetails: updatedData });
+    let updatedData;
+
+    if (name.includes('.')) {
+      const [parent, child] = name.split('.');
+      updatedData = {
+        ...localData,
+        [parent]: {
+          ...localData[parent],
+          [child]: value
+        }
+      };
     } else {
-      const updatedData = { ...localData, [name]: value };
-      
-      setLocalData(updatedData);
-      updateFormData({ personalDetails: updatedData });
+      updatedData = { ...localData, [name]: value };
     }
+
+    setLocalData(updatedData);
+    updateFormData({ personalDetails: updatedData });
   };
 
   const handleHeightChange = (e) => {
     const { name, value } = e.target;
     const updatedHeight = { ...localData.height, [name]: value };
     const updatedData = { ...localData, height: updatedHeight };
-    
+
     setLocalData(updatedData);
     updateFormData({ personalDetails: updatedData });
   };
@@ -100,7 +105,7 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
           className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
         })
       ),
-      
+
       // Date of Birth
       React.createElement(
         'div',
@@ -125,7 +130,7 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
           `Calculated Age: ${localData.age} years`
         )
       ),
-      
+
       // Gender
       React.createElement(
         'div',
@@ -148,7 +153,7 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
           React.createElement('option', { value: 'Female' }, 'Female')
         )
       ),
-      
+
       // Phone
       React.createElement(
         'div',
@@ -169,7 +174,7 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
           className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
         })
       ),
-      
+
       // Email
       React.createElement(
         'div',
@@ -189,7 +194,7 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
           className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
         })
       ),
-      
+
       // Marital Status
       React.createElement(
         'div',
@@ -212,7 +217,7 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
           React.createElement('option', { value: 'Awaiting Divorce' }, 'Awaiting Divorce')
         )
       ),
-      
+
       // Height (Feet)
       React.createElement(
         'div',
@@ -234,7 +239,7 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
           className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
         })
       ),
-      
+
       // Height (Inches)
       React.createElement(
         'div',
@@ -256,7 +261,7 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
           className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
         })
       ),
-      
+
       // Weight
       React.createElement(
         'div',
@@ -277,7 +282,7 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
           className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
         })
       ),
-      
+
       // Blood Group
       React.createElement(
         'div',
@@ -305,7 +310,7 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
           React.createElement('option', { value: 'O-' }, 'O-')
         )
       ),
-      
+
       // Complexion
       React.createElement(
         'div',
@@ -331,7 +336,7 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
         )
       )
     ),
-    
+
     // Address Section
     React.createElement(
       'div',
@@ -362,7 +367,7 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
             className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
           })
         ),
-        
+
         // City
         React.createElement(
           'div',
@@ -381,7 +386,7 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
             className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
           })
         ),
-        
+
         // State
         React.createElement(
           'div',
@@ -400,7 +405,7 @@ const PersonalDetailsForm = ({ formData, updateFormData }) => {
             className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
           })
         ),
-        
+
         // Pincode
         React.createElement(
           'div',

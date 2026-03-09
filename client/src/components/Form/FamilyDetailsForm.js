@@ -28,51 +28,51 @@ const FamilyDetailsForm = ({ formData, updateFormData }) => {
     aboutFamily: ''
   });
 
+  const [hasHydrated, setHasHydrated] = useState(false);
+
   // Load existing data when component mounts
   useEffect(() => {
-    if (formData && formData.familyDetails) {
-      setLocalData({
-        ...localData,
-        ...formData.familyDetails
-      });
+    if (formData?.familyDetails && !hasHydrated) {
+      setLocalData(prev => ({
+        ...prev,
+        ...formData.familyDetails,
+        father: { ...prev.father, ...(formData.familyDetails.father || {}) },
+        mother: { ...prev.mother, ...(formData.familyDetails.mother || {}) },
+        siblings: {
+          brothers: { ...prev.siblings.brothers, ...(formData.familyDetails.siblings?.brothers || {}) },
+          sisters: { ...prev.siblings.sisters, ...(formData.familyDetails.siblings?.sisters || {}) }
+        }
+      }));
+      setHasHydrated(true);
     }
-  }, [formData]);
+  }, [formData, hasHydrated]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
-    // Handle nested fields
+    let updatedData = { ...localData };
+
     if (name.includes('.')) {
       const parts = name.split('.');
-      let updatedData = { ...localData };
-      
+
       if (parts.length === 2) {
-        // Handle father/mother fields
-        if (parts[0] === 'father' || parts[0] === 'mother') {
-          const parent = parts[0];
-          const field = parts[1];
-          updatedData[parent] = { ...updatedData[parent], [field]: value };
-        }
-        // Handle family status/values/type
-        else if (['familyType', 'familyStatus', 'familyValues'].includes(parts[0])) {
-          updatedData[name] = value;
-        }
+        const [parent, child] = parts;
+        updatedData[parent] = { ...updatedData[parent], [child]: value };
       } else if (parts.length === 3) {
-        // Handle siblings fields (e.g., siblings.brothers.total)
-        const parent = parts[0];
-        const child = parts[1];
-        const field = parts[2];
-        updatedData[parent][child] = { ...updatedData[parent][child], [field]: parseInt(value) || 0 };
+        const [p1, p2, p3] = parts;
+        updatedData[p1] = {
+          ...updatedData[p1],
+          [p2]: {
+            ...updatedData[p1][p2],
+            [p3]: name.includes('total') || name.includes('married') ? (parseInt(value) || 0) : value
+          }
+        };
       }
-      
-      setLocalData(updatedData);
-      updateFormData({ familyDetails: updatedData });
     } else {
-      // Handle top-level fields
-      const updatedData = { ...localData, [name]: value };
-      setLocalData(updatedData);
-      updateFormData({ familyDetails: updatedData });
+      updatedData = { ...localData, [name]: value };
     }
+
+    setLocalData(updatedData);
+    updateFormData({ familyDetails: updatedData });
   };
 
   const handleAboutChange = (e) => {
@@ -118,7 +118,7 @@ const FamilyDetailsForm = ({ formData, updateFormData }) => {
               className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
             })
           ),
-          
+
           // Father's Occupation
           React.createElement(
             'div',
@@ -137,7 +137,7 @@ const FamilyDetailsForm = ({ formData, updateFormData }) => {
               className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
             })
           ),
-          
+
           // Father's Company
           React.createElement(
             'div',
@@ -158,7 +158,7 @@ const FamilyDetailsForm = ({ formData, updateFormData }) => {
           )
         )
       ),
-      
+
       // Mother's Details
       React.createElement(
         'div',
@@ -190,7 +190,7 @@ const FamilyDetailsForm = ({ formData, updateFormData }) => {
               className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
             })
           ),
-          
+
           // Mother's Occupation
           React.createElement(
             'div',
@@ -209,7 +209,7 @@ const FamilyDetailsForm = ({ formData, updateFormData }) => {
               className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
             })
           ),
-          
+
           // Mother's Company
           React.createElement(
             'div',
@@ -230,7 +230,7 @@ const FamilyDetailsForm = ({ formData, updateFormData }) => {
           )
         )
       ),
-      
+
       // Siblings Information
       React.createElement(
         'div',
@@ -274,7 +274,7 @@ const FamilyDetailsForm = ({ formData, updateFormData }) => {
                   className: 'w-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
                 })
               ),
-              
+
               // Married Brothers
               React.createElement(
                 'div',
@@ -296,7 +296,7 @@ const FamilyDetailsForm = ({ formData, updateFormData }) => {
               )
             )
           ),
-          
+
           // Sisters
           React.createElement(
             'div',
@@ -328,7 +328,7 @@ const FamilyDetailsForm = ({ formData, updateFormData }) => {
                   className: 'w-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
                 })
               ),
-              
+
               // Married Sisters
               React.createElement(
                 'div',
@@ -352,7 +352,7 @@ const FamilyDetailsForm = ({ formData, updateFormData }) => {
           )
         )
       ),
-      
+
       // Family Information
       React.createElement(
         'div',
@@ -381,7 +381,7 @@ const FamilyDetailsForm = ({ formData, updateFormData }) => {
               React.createElement('option', { value: 'Extended' }, 'Extended')
             )
           ),
-          
+
           // Family Status
           React.createElement(
             'div',
@@ -404,7 +404,7 @@ const FamilyDetailsForm = ({ formData, updateFormData }) => {
               React.createElement('option', { value: 'Rich' }, 'Rich')
             )
           ),
-          
+
           // Family Values
           React.createElement(
             'div',
@@ -428,7 +428,7 @@ const FamilyDetailsForm = ({ formData, updateFormData }) => {
             )
           )
         ),
-        
+
         // About Family
         React.createElement(
           'div',
